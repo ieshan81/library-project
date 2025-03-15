@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Netflix Books - Reader</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- PDF.js library from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.6.172/pdf.min.js"></script>
+</head>
+<body>
+  <header class="nf-header">
+    <div class="nf-logo">Netflix Books</div>
+    <nav class="nf-nav-links">
+      <a href="home.html">Home</a>
+      <a href="library.html">Library</a>
+      <a href="dashboard.html">My Dashboard</a>
+      <a href="#" id="logoutBtn">Sign Out</a>
+    </nav>
+  </header>
+  <main>
+    <div class="pdf-reader-container">
+      <div id="pdf-canvas-container">
+        <canvas id="pdf-canvas-1"></canvas>
+        <canvas id="pdf-canvas-2" style="display: none;"></canvas>
+      </div>
+      <div class="pdf-controls">
+        <button id="prev-page">Previous</button>
+        <span>Page <span id="page-num"></span> of <span id="page-count"></span></span>
+        <button id="next-page">Next</button>
+
+        <input type="number" id="page-input" min="1" placeholder="Page #" />
+        <button id="go-page">Go</button>
+
+        <button id="toggle-layout">Two-Page Layout</button>
+        <button id="bookmark-btn">Bookmark</button>
+        <button id="fullscreen-btn">Fullscreen</button>
+      </div>
+    </div>
+  </main>
+  <footer class="nf-footer">
+    <p>&copy; 2025 Netflix Books</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

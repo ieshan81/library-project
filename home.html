@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Netflix Books - Home</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <header class="nf-header">
+    <div class="nf-logo">Netflix Books</div>
+    <nav class="nf-nav-links">
+      <a href="home.html">Home</a>
+      <a href="library.html?genre=Fantasy">Fantasy</a>
+      <a href="library.html?genre=Romance">Romance</a>
+      <a href="library.html?genre=YA">YA</a>
+      <a href="dashboard.html">My Dashboard</a>
+      <a href="#" id="logoutBtn">Sign Out</a>
+    </nav>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="nf-hero">
+    <div class="nf-hero-overlay"></div>
+    <div class="nf-hero-content">
+      <h1>Your Next Favorite Book</h1>
+      <p>Immerse yourself in stories from every genre.</p>
+      <a href="#row-1" class="nf-hero-btn">Browse Now</a>
+    </div>
+  </section>
+
+  <!-- Main content with multiple Netflix-like rows -->
+  <main id="home-main" style="margin-top:60px;">
+    <!-- Row 0: "Continue Reading" -->
+    <section class="nf-category-container" id="row-0" style="display:none;">
+      <h2 class="nf-row-title">Continue Reading</h2>
+      <div class="nf-row-books" id="continue-reading-container"></div>
+    </section>
+
+    <section class="nf-category-container" id="row-1">
+      <h2 class="nf-row-title">Your Next Read</h2>
+      <div class="nf-row-books" id="next-read-container"></div>
+    </section>
+
+    <section class="nf-category-container" id="row-2">
+      <h2 class="nf-row-title">Top Picks</h2>
+      <div class="nf-row-books" id="top-picks-container"></div>
+    </section>
+
+    <section class="nf-category-container" id="row-3">
+      <h2 class="nf-row-title">Fantasy</h2>
+      <div class="nf-row-books" id="fantasy-container"></div>
+    </section>
+  </main>
+
+  <footer class="nf-footer">
+    <p>&copy; 2025 Netflix Books</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

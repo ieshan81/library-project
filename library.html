@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Netflix Books - Library</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <header class="nf-header">
+    <div class="nf-logo">Netflix Books</div>
+    <nav class="nf-nav-links">
+      <a href="home.html">Home</a>
+      <a href="dashboard.html">My Dashboard</a>
+      <a href="#" id="logoutBtn">Sign Out</a>
+    </nav>
+  </header>
+
+  <main id="library-section" style="margin-top:60px;">
+    <div class="library-header">
+      <h1>All Books</h1>
+      <input type="text" id="searchBar" placeholder="Search books..."/>
+    </div>
+    <section class="nf-row nf-row-books" id="library-container"></section>
+  </main>
+
+  <footer class="nf-footer">
+    <p>&copy; 2025 Netflix Books</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
