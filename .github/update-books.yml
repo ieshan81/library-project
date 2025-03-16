@@ -1,1 +1,36 @@
+name: Update Books JSON
+
+# Trigger the workflow when files in the books folder change.
+on:
+  push:
+    paths:
+      - 'books/**'
+
+jobs:
+  update_books:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Run updateBooks.js script
+        run: node updateBooks.js
+
+      - name: Commit changes if any
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain books.json)" ]; then
+            git add books.json
+            git commit -m "Auto-update books.json [skip ci]"
+            git push;
+          else
+            echo "No changes in books.json.";
+          fi
 
