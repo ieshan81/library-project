@@ -3,7 +3,7 @@ console.log("Script.js is loading properly!");
  * COMPLETE script.js
  * 
  * This version fetches the PDF list from a Netlify Function
- * at "https://<your-site>.netlify.app/.netlify/functions/listBooks"
+ * at "https://library-project-app.netlify.app/.netlify/functions/listBooks"
  * instead of a local books.json file.
  *********************************************************/
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,13 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
   /*********************************************
    * 2) FETCH BOOK LIST FROM NETLIFY FUNCTION
    *********************************************/
-  const functionURL = 'https://library-project-app.netlify.app/.netlify/functions/listBooks';
-  console.log("Netlify function URL is:", functionURL);
-  
-  fetch(functionURL)
-    .then(...)
-    ...
-  
+  function fetchBooksList(callback) {
+    const functionURL = 'https://library-project-app.netlify.app/.netlify/functions/listBooks';
+    console.log("Netlify function URL is:", functionURL);
+
+    fetch(functionURL)
       .then(response => response.json())
       .then(data => {
         if (data && data.books) {
@@ -433,8 +431,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('go-page').addEventListener('click', () => {
-      const pageInput = document.getElementById('page-input').value;
-      let target = parseInt(pageInput, 10);
+      const pageInput = document.getElementById('page-input');
+      let target = parseInt(pageInput.value, 10);
       if (!isNaN(target) && target >= 1 && target <= pdfDoc.numPages) {
         if (twoPageLayout && target % 2 === 0) {
           target = target - 1;
