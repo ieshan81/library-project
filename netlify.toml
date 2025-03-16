@@ -1,0 +1,4 @@
+[functions]
+# Tells Netlify to include all PDF files in "books" in the function bundle
+included_files = ["books/*.pdf"]
+
