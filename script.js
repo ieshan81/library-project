@@ -1,23 +1,33 @@
+/*********************************************************
+ * COMPLETE script.js
+ * 
+ * This version fetches the PDF list from a Netlify Function
+ * at "https://<your-site>.netlify.app/.netlify/functions/listBooks"
+ * instead of a local books.json file.
+ *********************************************************/
 document.addEventListener('DOMContentLoaded', () => {
   const path = window.location.pathname;
 
   /*********************************************
-   * 1) FAKE AUTH (Demo Only)
+   * 1) FAKE AUTH (DEMO ONLY)
    *********************************************/
   const loginBtn = document.getElementById('loginBtn');
   const logoutBtn = document.getElementById('logoutBtn');
+
   if (loginBtn) {
     loginBtn.addEventListener('click', () => {
       localStorage.setItem('loggedIn', 'true');
       window.location.href = 'home.html';
     });
   }
+
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('loggedIn');
       window.location.href = 'index.html';
     });
   }
+
   const restrictedPages = ['home.html', 'library.html', 'dashboard.html', 'reader.html'];
   const isRestricted = restrictedPages.some(page => path.endsWith(page));
   if (isRestricted && !localStorage.getItem('loggedIn')) {
@@ -25,20 +35,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /*********************************************
-   * 2) FETCH BOOK LIST FROM books.json
+   * 2) FETCH BOOK LIST FROM NETLIFY FUNCTION
    *********************************************/
   function fetchBooksList(callback) {
-    fetch('books.json')
+    // Replace <your-site> with your actual Netlify subdomain
+    const functionURL = 'https://<your-site>.netlify.app/.netlify/functions/listBooks';
+
+    fetch(functionURL)
       .then(response => response.json())
       .then(data => {
         if (data && data.books) {
-          callback(data.books); // array of strings
+          callback(data.books);
         } else {
           callback([]);
         }
       })
       .catch(err => {
-        console.error("Error fetching books.json:", err);
+        console.error("Error fetching book list from Netlify function:", err);
         callback([]);
       });
   }
@@ -48,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
    *********************************************/
   function fetchBookData(title, callback) {
     const googleUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(title)}`;
+
     fetch(googleUrl)
       .then(response => response.json())
       .then(data => {
@@ -71,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function fetchOpenLibrary(title, callback) {
     const olUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(title)}`;
+
     fetch(olUrl)
       .then(response => response.json())
       .then(data => {
@@ -107,9 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return [];
   }
+
   function setLocalStorageArray(key, arr) {
     localStorage.setItem(key, JSON.stringify(arr));
   }
+
   function updateCurrentRead(book, page) {
     let currentReads = getLocalStorageArray('currentReads');
     const idx = currentReads.findIndex(entry => entry.book === book);
@@ -121,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     setLocalStorageArray('currentReads', currentReads);
   }
+
   function addToTBR(bookFile) {
     let tbr = getLocalStorageArray('tbrBooks');
     if (!tbr.includes(bookFile)) {
@@ -131,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Already in TBR list.');
     }
   }
+
   function addToLiked(bookFile) {
     let liked = getLocalStorageArray('likedBooks');
     if (!liked.includes(bookFile)) {
@@ -143,18 +162,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /*********************************************
-   * 5) CREATE NETFLIX-LIKE HOVER CARD (Portrait Ratio)
+   * 5) CREATE A "NETFLIX-LIKE" HOVER CARD
    *********************************************/
   function createNetflixHoverCard(bookFile) {
-    // e.g., "Begin_Again-Mona_Kasten.pdf"
+    // bookFile is something like "Harry_Potter_And_The_Sorcerers_Stone-J.K._Rowling.pdf"
     const displayTitle = bookFile.replace('.pdf', '').replace(/[_-]/g, ' ');
 
+    // Outer container
     const cardDiv = document.createElement('div');
     cardDiv.className = 'nf-hover-card';
 
+    // We'll fetch metadata from the APIs
     fetchBookData(displayTitle, ({ coverUrl, synopsis, authors, publishedYear, categories }) => {
       const cover = coverUrl || 'images/placeholder.jpg';
       const categoryText = categories.length > 0 ? categories.join(", ") : "";
+      // We'll create an expanded overlay that shows more details
       cardDiv.innerHTML = `
         <div class="card-poster" style="background-image: url('${cover}')"></div>
         <div class="card-overlay">
@@ -178,11 +200,14 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
       `;
+
       // Start Reading
       cardDiv.querySelector('.start-reading-btn').addEventListener('click', (e) => {
         e.stopPropagation();
+        // We'll open the local PDF in reader.html
         window.location.href = `reader.html?book=${encodeURIComponent(bookFile)}`;
       });
+
       // Like / TBR
       cardDiv.querySelector('.like-btn').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -198,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cardDiv.addEventListener('click', () => {
       window.location.href = `reader.html?book=${encodeURIComponent(bookFile)}`;
     });
+
     return cardDiv;
   }
 
@@ -212,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const continueReadingContainer = document.getElementById('continue-reading-container');
       if (currentReads.length > 0) {
         row0Section.style.display = 'block';
-        // Sort by most recent
+        // Sort by most recent update
         const sortedReads = currentReads.slice().sort((a,b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
         sortedReads.forEach(entry => {
           continueReadingContainer.appendChild(createNetflixHoverCard(entry.book));
@@ -247,17 +273,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (path.endsWith('library.html')) {
     const libraryContainer = document.getElementById('library-container');
     const searchBar = document.getElementById('searchBar');
+
     fetchBooksList(allBooks => {
       allBooks.forEach(bookFile => {
         libraryContainer.appendChild(createNetflixHoverCard(bookFile));
       });
+
       if (searchBar) {
         searchBar.addEventListener('input', () => {
           const query = searchBar.value.toLowerCase();
           document.querySelectorAll('.nf-hover-card').forEach(item => {
-            const t = item.querySelector('.overlay-title');
-            const txt = t ? t.textContent.toLowerCase() : '';
-            item.style.display = txt.includes(query) ? 'inline-block' : 'none';
+            const titleElem = item.querySelector('.overlay-title');
+            const titleText = titleElem ? titleElem.textContent.toLowerCase() : '';
+            item.style.display = titleText.includes(query) ? 'inline-block' : 'none';
           });
         });
       }
@@ -273,7 +301,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const tbrBooks = getLocalStorageArray('tbrBooks');
     const likedBooks = getLocalStorageArray('likedBooks');
 
+    // We still fetch the entire list, though we only need it if you want metadata
+    // for TBR/liked books. If you just want to display them, you can skip fetchBooksList.
     fetchBooksList(allBooks => {
+      // TBR
       if (tbrBooks.length > 0) {
         tbrBooks.forEach(bookFile => {
           tbrContainer.appendChild(createNetflixHoverCard(bookFile));
@@ -282,6 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tbrContainer.innerHTML = '<p>No books in your TBR list.</p>';
       }
 
+      // Liked
       if (likedBooks.length > 0) {
         likedBooks.forEach(bookFile => {
           likedContainer.appendChild(createNetflixHoverCard(bookFile));
@@ -293,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /*********************************************
-   * 9) READER PAGE LOGIC (Local PDFs)
+   * 9) READER PAGE LOGIC (PDF.js with local PDFs)
    *********************************************/
   if (path.endsWith('reader.html')) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -302,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error("No 'book' param found in URL.");
       return;
     }
-    // Always load PDF from local "books" folder
+    // PDF location: /books/<bookParam>
     const pdfUrl = `books/${bookParam}`;
     console.log("Loading local PDF from:", pdfUrl);
 
@@ -360,6 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
+
     function queueRenderPage(num) {
       if (pageRendering) {
         pageNumPending = num;
@@ -367,6 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPage(num);
       }
     }
+
     document.getElementById('prev-page').addEventListener('click', () => {
       if (twoPageLayout) {
         if (pageNum > 1) {
@@ -380,6 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+
     document.getElementById('next-page').addEventListener('click', () => {
       if (twoPageLayout) {
         if ((pageNum + 1) < pdfDoc.numPages) {
@@ -393,6 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+
     document.getElementById('go-page').addEventListener('click', () => {
       const pageInput = document.getElementById('page-input').value;
       let target = parseInt(pageInput, 10);
@@ -404,6 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
         queueRenderPage(pageNum);
       }
     });
+
     document.getElementById('toggle-layout').addEventListener('click', () => {
       twoPageLayout = !twoPageLayout;
       const toggleBtn = document.getElementById('toggle-layout');
@@ -413,14 +450,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       queueRenderPage(pageNum);
     });
+
     document.getElementById('bookmark-btn').addEventListener('click', () => {
       updateCurrentRead(bookParam, pageNum);
       alert(`Bookmarked at page ${pageNum}`);
     });
 
-    // Fullscreen
+    // Fullscreen logic
     const fullscreenBtn = document.getElementById('fullscreen-btn');
     const readerContainer = document.querySelector('.pdf-reader-container');
+
     fullscreenBtn.addEventListener('click', () => {
       if (!document.fullscreenElement) {
         if (readerContainer.requestFullscreen) {
@@ -442,11 +481,13 @@ document.addEventListener('DOMContentLoaded', () => {
         fullscreenBtn.textContent = 'Fullscreen';
       }
     });
+
     document.addEventListener('fullscreenchange', () => {
       if (!document.fullscreenElement) {
         fullscreenBtn.textContent = 'Fullscreen';
       }
     });
+
     document.addEventListener('keydown', e => {
       if (document.fullscreenElement === readerContainer) {
         if (e.key === 'ArrowLeft') queueRenderPage(pageNum - 1);
@@ -454,7 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Load the local PDF
+    // Load the local PDF using PDF.js
     pdfjsLib.getDocument(pdfUrl).promise.then(pdf => {
       pdfDoc = pdf;
       document.getElementById('page-count').textContent = pdfDoc.numPages;
