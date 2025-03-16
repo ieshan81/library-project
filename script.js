@@ -1,3 +1,4 @@
+console.log("Script.js is loading properly!");
 /*********************************************************
  * COMPLETE script.js
  * 
