@@ -38,11 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
   /*********************************************
    * 2) FETCH BOOK LIST FROM NETLIFY FUNCTION
    *********************************************/
-  function fetchBooksList(callback) {
-    // Replace <your-site> with your actual Netlify subdomain
-    const functionURL = 'https://library-project-app.netlify.app/.netlify/functions/listBooks';
-
-    fetch(functionURL)
+  const functionURL = 'https://library-project-app.netlify.app/.netlify/functions/listBooks';
+  console.log("Netlify function URL is:", functionURL);
+  
+  fetch(functionURL)
+    .then(...)
+    ...
+  
       .then(response => response.json())
       .then(data => {
         if (data && data.books) {
