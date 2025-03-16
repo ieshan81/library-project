@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
    *********************************************/
   function fetchBooksList(callback) {
     // Replace <your-site> with your actual Netlify subdomain
-    const functionURL = 'https://<library-project-app.netlify.app/.netlify/functions/listBooks';
+    const functionURL = 'https://library-project-app.netlify.app/.netlify/functions/listBooks';
 
     fetch(functionURL)
       .then(response => response.json())
