@@ -1,33 +1,41 @@
-// netlify/functions/listBooks.js
+import { createClient } from '@supabase/supabase-js';
 
-const fs = require('fs');
-const path = require('path');
+// Supabase credentials
+const SUPABASE_URL = 'https://mwizadapnvzxgelyxhvb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13aXphZGFwbnZ6eGdlbHl4aHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1OTAzNjksImV4cCI6MjA1ODE2NjM2OX0.XEKmvNtbYpxCWGdWT1n9GDIVGp8qqUnz8hFK9sRq_z0';
 
-// This function will list all PDF files in your "books" folder.
-// Since your function is in netlify/functions, we need to step up two levels to reach the repository root.
-const booksDir = path.join(__dirname, '..', '..', 'books');
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-exports.handler = async (event, context) => {
+exports.handler = async () => {
   try {
-    // Read all files in the "books" folder
-    const files = fs.readdirSync(booksDir);
-    // Filter only PDF files (case-insensitive)
-    const pdfFiles = files.filter(file => file.toLowerCase().endsWith('.pdf'));
-    
-    // Return JSON response with proper headers (including CORS)
+    // Fetch list of books from the Supabase storage bucket
+    const { data, error } = await supabase.storage.from('books').list();
+
+    if (error) {
+      console.error("Error fetching books from Supabase:", error);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Error fetching books from Supabase" })
+      };
+    }
+
+    // Generate public URLs for the books
+    const books = data.map(book => ({
+      name: book.name,
+      url: `${SUPABASE_URL}/storage/v1/object/public/books/${book.name}`
+    }));
+
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*' // Adjust as needed
-      },
-      body: JSON.stringify({ books: pdfFiles })
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ books })
     };
+
   } catch (error) {
-    console.error("Error reading books folder:", error);
+    console.error("Unexpected error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Error reading books folder", details: error.message })
+      body: JSON.stringify({ error: "Unexpected error fetching books" })
     };
   }
 };
