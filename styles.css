@@ -19,13 +19,6 @@ body {
   position: relative;
   background-color: #141414;
 }
-.login-background {
-  width: 100%;
-  height: 100%;
-  background: url('https://assets.nflxext.com/ffe/siteui/vlv3/9b495931-108d-40e5-98b7-5be8432b407a/5c099bfa-7f78-45a0-93ab-bb8260f94be7/NG-en-20230313-popsignuptwoweeks-perspective_alpha_website_large.jpg')
-    center/cover no-repeat;
-  position: relative;
-}
 .login-gradient {
   position: absolute;
   width: 100%;

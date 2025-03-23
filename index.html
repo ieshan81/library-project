@@ -4,9 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Netflix Books - Login</title>
-  <link rel="stylesheet" href="styles.css" />
+
   <!-- Netlify Identity Widget -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  
+  <!-- Link to your main stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="login-body">
   <div class="login-background">
@@ -15,12 +18,16 @@
       <h1 class="login-logo">Netflix Books</h1>
       <div class="login-box">
         <h2>Sign In / Sign Up</h2>
+        <!-- Optional manual sign-in button if auto-open doesn't fire for some reason -->
+        <button id="loginBtn">Sign In</button>
         <p class="login-disclaimer">
-          If you're not logged in, the Identity widget will open automatically.
+          If you are not logged in, the Identity widget should open automatically.
         </p>
       </div>
     </div>
   </div>
+
+  <!-- Your main script with Netlify Identity logic -->
   <script src="script.js"></script>
 </body>
 </html>
