@@ -24,12 +24,20 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = 'index.html';
     });
   });
+  
+  // Optionally, you can listen for the login event and redirect
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on('login', user => {
+      console.log('Logged in as:', user.email);
+      // Redirect to home page after login
+      window.location.href = 'home.html';
+    });
+  }
 });
 
 /*********************************************
  * BOOKS LISTING LOGIC (Fetching from Netlify Function)
  *********************************************/
-// This function fetches the list of books (PDFs) from our Netlify function
 function fetchBooksList(callback) {
   // Change this URL if needed; by default Netlify functions are hosted under /.netlify/functions/
   const functionURL = '/.netlify/functions/listBooks';
