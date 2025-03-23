@@ -1,4 +1,27 @@
 /*********************************************
+ * LOGIN & LOGOUT EVENT LISTENERS
+ *********************************************/
+document.addEventListener('DOMContentLoaded', () => {
+  const loginBtn = document.getElementById('loginBtn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // In this demo any email/password works; redirect to home page.
+      window.location.href = 'home.html';
+    });
+  }
+  
+  const logoutBtns = document.querySelectorAll('#logoutBtn');
+  logoutBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Clear any stored user data if needed and redirect to login.
+      window.location.href = 'index.html';
+    });
+  });
+});
+
+/*********************************************
  * 1) SUPABASE SETUP
  *********************************************/
 const { createClient } = supabase;
