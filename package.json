@@ -1,10 +1,10 @@
 {
-  "name": "library-project",
+  "name": "netflix-books-website",
   "version": "1.0.0",
   "description": "Netflix Books application",
   "main": "index.js",
   "dependencies": {
-    "@supabase/supabase-js": "^2.0.0"
+    "node-fetch": "^2.6.1"
   },
   "scripts": {
     "build": "echo 'No build step required'"

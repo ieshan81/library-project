@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Netflix Books - Reader</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- PDF.js library from CDN -->
+  <!-- PDF.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.6.172/pdf.min.js"></script>
-  <!-- Supabase JS library -->
-  <script src="https://unpkg.com/@supabase/supabase-js/dist/umd/supabase.js"></script>
 </head>
 <body>
   <header class="nf-header">
@@ -21,7 +19,7 @@
     </nav>
   </header>
   <main>
-    <!-- Added id="pdf-viewer" to match script.js expectation -->
+    <!-- Container for PDF viewer; the Netlify function supplies the list of PDFs -->
     <div class="pdf-reader-container" id="pdf-viewer">
       <div id="pdf-canvas-container">
         <canvas id="pdf-canvas-1"></canvas>
