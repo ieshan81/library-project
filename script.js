@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const { data, error } = await supabase
       .storage
       .from('books')
-      .list('pdfs', { limit: 100 });
+      .list('pdfs/', { limit: 100 });
 
     if (error) {
       console.error("Error fetching books from Supabase:", error);
