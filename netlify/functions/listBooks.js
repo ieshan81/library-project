@@ -7,31 +7,17 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 exports.handler = async (event, context) => {
   try {
-    const { data, error } = await supabase.storage.from('books').list('pdfs');
-    if (error) {
-      return {
-        statusCode: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type',
-        },
-        body: JSON.stringify({ error: "Failed to list books", details: error.message }),
-      };
-    }
-    const pdfFiles = data
-      .filter(file => file.name.toLowerCase().endsWith('.pdf'))
-      .map(file => file.name);
+    // Temporarily list all objects in the bucket for debugging:
+    const { data, error } = await supabase.storage.from('books').list('', { limit: 100 });
+    console.log("All bucket data:", data, error);
+    // Return the full list as JSON for inspection:
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
       },
-      body: JSON.stringify({ books: pdfFiles }),
+      body: JSON.stringify({ books: data }),
     };
   } catch (err) {
     return {
