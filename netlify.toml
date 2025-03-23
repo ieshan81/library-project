@@ -1,4 +1,9 @@
-[functions]
-# Tells Netlify to include all PDF files in "books" in the function bundle
-included_files = ["books/*.pdf"]
+[build]
+  command = "npm run build"  # This runs the dummy build script from package.json
+  publish = "."  # The directory containing your static files (e.g., home.html, script.js, etc.)
+  functions = "netlify/functions"  # The directory containing your Netlify Functions
 
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,33 +1,59 @@
 // netlify/functions/listBooks.js
 
-const fs = require('fs');
-const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
-// This function will list all PDF files in your "books" folder.
-// Since your function is in netlify/functions, we need to step up two levels to reach the repository root.
-const booksDir = path.join(__dirname, '..', '..', 'books');
+// Supabase credentials (same as in script.js)
+const SUPABASE_URL = "https://mwizadapnvzxgelyxhvb.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13aXphZGFwbnZ6eGdlbHl4aHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1OTAzNjksImV4cCI6MjA1ODE2NjM2OX0.XEKmvNtbYpxCWGdWT1n9GDIVGp8qqUnz8hFK9sRq_z0";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 exports.handler = async (event, context) => {
   try {
-    // Read all files in the "books" folder
-    const files = fs.readdirSync(booksDir);
-    // Filter only PDF files (case-insensitive)
-    const pdfFiles = files.filter(file => file.toLowerCase().endsWith('.pdf'));
+    // List all files in the 'pdfs' folder of the 'books' bucket
+    const { data, error } = await supabase.storage.from('books').list('pdfs');
     
-    // Return JSON response with proper headers (including CORS)
+    if (error) {
+      console.error("Error listing files from Supabase:", error);
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+        body: JSON.stringify({ error: "Failed to list books", details: error.message }),
+      };
+    }
+
+    // Filter for PDF files and extract their names
+    const pdfFiles = data
+      .filter(file => file.name.toLowerCase().endsWith('.pdf'))
+      .map(file => file.name);
+
+    // Return the list of PDF files
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*' // Adjust as needed
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
       },
-      body: JSON.stringify({ books: pdfFiles })
+      body: JSON.stringify({ books: pdfFiles }),
     };
-  } catch (error) {
-    console.error("Error reading books folder:", error);
+  } catch (err) {
+    console.error("Unexpected error in listBooks function:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Error reading books folder", details: error.message })
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+      body: JSON.stringify({ error: "Unexpected error", details: err.message }),
     };
   }
 };

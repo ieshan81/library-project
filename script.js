@@ -39,28 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
    * 2) FETCH BOOK LIST FROM SUPABASE STORAGE
    *********************************************/
   function fetchBooksList(callback) {
-    console.log("Fetching PDF list from Supabase Storage...");
-    // List files from the "books" bucket under the "pdfs" folder.
-    supabase
-      .storage
-      .from('books')
-      .list('pdfs', { limit: 100 })
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("Error listing PDFs:", error);
+    const functionURL = 'https://library-project-app.netlify.app/.netlify/functions/listBooks';
+
+    function fetchBooksList(callback) {
+      fetch(functionURL)
+        .then(response => response.json())
+        .then(data => {
+          if (data.books) {
+            callback(data.books);
+          } else {
+            callback([]);
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching book list from Netlify function:", err);
           callback([]);
-          return;
-        }
-        if (!data) {
-          callback([]);
-          return;
-        }
-        // Extract file names
-        const pdfFiles = data.map(fileObj => fileObj.name);
-        console.log("Found PDFs in Supabase:", pdfFiles);
-        callback(pdfFiles);
-      });
-  }
+        });
+    }
+    
 
   /*********************************************
    * 3) GOOGLE/OPEN LIBRARY API: Cover + Metadata
