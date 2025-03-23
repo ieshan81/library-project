@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const restrictedPages = ['home.html', 'library.html', 'dashboard.html', 'reader.html'];
+  const restrictedPages = ['home.html','library.html','dashboard.html','reader.html'];
   const isRestricted = restrictedPages.some(page => path.endsWith(page));
   if (isRestricted && !localStorage.getItem('loggedIn')) {
     window.location.href = 'index.html';
@@ -38,30 +38,29 @@ document.addEventListener('DOMContentLoaded', () => {
   /*********************************************
    * 2) FETCH BOOK LIST FROM SUPABASE STORAGE
    *********************************************/
-  // This function lists files from the "books" bucket's "pdfs" folder.
-  // If your PDFs are stored at the bucket root, change 'pdfs' to ''.
-  function fetchBooksList(callback) {
+  async function fetchBooksList(callback) {
     console.log("Fetching books from Supabase...");
-    supabase
+
+    // Adjust 'pdfs' to '' if your PDFs are at the root
+    const { data, error } = await supabase
       .storage
       .from('books')
-      .list('pdfs', { limit: 100 })
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("Error fetching books from Supabase:", error);
-          callback([]);
-          return;
-        }
-        if (!data || data.length === 0) {
-          console.warn("No books found in Supabase.");
-          callback([]);
-          return;
-        }
-        // data is an array of file objects; we extract the file name.
-        const pdfFiles = data.map(fileObj => fileObj.name);
-        console.log("Found books:", pdfFiles);
-        callback(pdfFiles);
-      });
+      .list('pdfs', { limit: 100 });
+
+    if (error) {
+      console.error("Error fetching books from Supabase:", error);
+      callback([]);
+      return;
+    }
+    if (!data || data.length === 0) {
+      console.warn("No books found in Supabase.");
+      callback([]);
+      return;
+    }
+    // data is an array of file objects
+    const pdfFiles = data.map(fileObj => fileObj.name);
+    console.log("Found books:", pdfFiles);
+    callback(pdfFiles);
   }
 
   /*********************************************
@@ -89,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchOpenLibrary(title, callback);
       });
   }
+
   function fetchOpenLibrary(title, callback) {
     const olUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(title)}`;
     fetch(olUrl)
@@ -166,11 +166,12 @@ document.addEventListener('DOMContentLoaded', () => {
    * 5) CREATE A "NETFLIX-LIKE" HOVER CARD
    *********************************************/
   function createNetflixHoverCard(bookFile) {
-    // bookFile is a filename (e.g., "The_Love_Hypothesis-Ali_Hazelwood.pdf")
+    // e.g. "Harry_Potter_And_The_Sorcerers_Stone.pdf"
     const displayTitle = bookFile.replace('.pdf', '').replace(/[_-]/g, ' ');
     const cardDiv = document.createElement('div');
     cardDiv.className = 'nf-hover-card';
 
+    // Fetch book metadata from Google/OpenLibrary
     fetchBookData(displayTitle, ({ coverUrl, synopsis, authors, publishedYear, categories }) => {
       const cover = coverUrl || 'images/placeholder.jpg';
       const categoryText = categories.length > 0 ? categories.join(", ") : "";
@@ -190,51 +191,38 @@ document.addEventListener('DOMContentLoaded', () => {
               <button class="like-btn">Like</button>
               <button class="tbr-btn">TBR</button>
             </div>
-            <div class="overlay-chapters">
-              <h4>Chapters</h4>
-              <p>Chapter 1, Chapter 2, Chapter 3, ...</p>
-            </div>
           </div>
         </div>
       `;
 
+      // "Start Reading" → generate public URL → go to reader.html
       cardDiv.querySelector('.start-reading-btn').addEventListener('click', (e) => {
         e.stopPropagation();
-        supabase.storage
+        const { data, error } = supabase.storage
           .from('books')
-          .getPublicUrl(`pdfs/${bookFile}`)
-          .then(({ data, error }) => {
-            if (error) {
-              console.error("Error getting public URL:", error);
-              alert("Cannot load PDF.");
-              return;
-            }
-            window.location.href = `reader.html?pdfUrl=${encodeURIComponent(data.publicUrl)}`;
-          });
-      });
-
-      cardDiv.querySelector('.like-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        addToLiked(bookFile);
-      });
-      cardDiv.querySelector('.tbr-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        addToTBR(bookFile);
+          .getPublicUrl(`pdfs/${bookFile}`);
+        if (error) {
+          console.error("Error getting public URL:", error);
+          alert("Cannot load PDF.");
+          return;
+        }
+        const pdfUrl = data.publicUrl;
+        window.location.href = `reader.html?pdfUrl=${encodeURIComponent(pdfUrl)}`;
       });
     });
 
+    // If user clicks the card
     cardDiv.addEventListener('click', () => {
-      supabase.storage
+      const { data, error } = supabase.storage
         .from('books')
-        .getPublicUrl(`pdfs/${bookFile}`)
-        .then(({ data, error }) => {
-          if (error) {
-            console.error("Error getting public URL:", error);
-            alert("Cannot load PDF.");
-            return;
-          }
-          window.location.href = `reader.html?pdfUrl=${encodeURIComponent(data.publicUrl)}`;
-        });
+        .getPublicUrl(`pdfs/${bookFile}`);
+      if (error) {
+        console.error("Error getting public URL:", error);
+        alert("Cannot load PDF.");
+        return;
+      }
+      const pdfUrl = data.publicUrl;
+      window.location.href = `reader.html?pdfUrl=${encodeURIComponent(pdfUrl)}`;
     });
 
     return cardDiv;
@@ -259,19 +247,19 @@ document.addEventListener('DOMContentLoaded', () => {
         row0Section.style.display = 'none';
       }
 
-      // "Your Next Read" row: first 5 books
+      // "Your Next Read" => first 5
       const row1 = document.getElementById('next-read-container');
       allBooks.slice(0, 5).forEach(bookFile => {
         row1.appendChild(createNetflixHoverCard(bookFile));
       });
 
-      // "Top Picks" row: next 5 books
+      // "Top Picks" => next 5
       const row2 = document.getElementById('top-picks-container');
       allBooks.slice(5, 10).forEach(bookFile => {
         row2.appendChild(createNetflixHoverCard(bookFile));
       });
 
-      // "Fantasy" row: next 5 books
+      // "Fantasy" => next 5
       const row3 = document.getElementById('fantasy-container');
       allBooks.slice(10, 15).forEach(bookFile => {
         row3.appendChild(createNetflixHoverCard(bookFile));
@@ -285,6 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (path.endsWith('library.html')) {
     const libraryContainer = document.getElementById('library-container');
     const searchBar = document.getElementById('searchBar');
+
     fetchBooksList(allBooks => {
       allBooks.forEach(bookFile => {
         libraryContainer.appendChild(createNetflixHoverCard(bookFile));
