@@ -1,12 +1,12 @@
 {
-    "name": "library-project",
-    "version": "1.0.0",
-    "description": "Netflix Books application",
-    "main": "index.js",
-    "dependencies": {
-      "@supabase/supabase-js": "^2.0.0"
-    },
-    "scripts": {
-      "build": "echo 'No build step required'"
-    }
+  "name": "library-project",
+  "version": "1.0.0",
+  "description": "Netflix Books application",
+  "main": "index.js",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "scripts": {
+    "build": "echo 'No build step required'"
   }
+}

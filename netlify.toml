@@ -1,7 +1,7 @@
 [build]
-  command = "npm run build"  # This runs the dummy build script from package.json
-  publish = "."  # The directory containing your static files (e.g., home.html, script.js, etc.)
-  functions = "netlify/functions"  # The directory containing your Netlify Functions
+  command = "npm run build"
+  publish = "."
+  functions = "netlify/functions"
 
 [[redirects]]
   from = "/*"
