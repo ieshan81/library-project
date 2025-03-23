@@ -3,21 +3,23 @@
  *********************************************/
 document.addEventListener('DOMContentLoaded', () => {
   if (window.netlifyIdentity) {
+    // If not logged in, open the widget automatically
     window.netlifyIdentity.on('init', user => {
-      if (!user) {
-        window.netlifyIdentity.open();
-      }
+      if (!user) window.netlifyIdentity.open();
     });
+    // Redirect after login
     window.netlifyIdentity.on('login', user => {
       console.log('Logged in as:', user.email);
       window.location.href = 'home.html';
     });
+    // Redirect after logout
     window.netlifyIdentity.on('logout', () => {
       console.log('User logged out');
       window.location.href = 'index.html';
     });
   }
-  // Optional manual login button (if present)
+  
+  // Optional manual login button
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) {
     loginBtn.addEventListener('click', e => {
@@ -25,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.netlifyIdentity) window.netlifyIdentity.open();
     });
   }
+  
   // Logout buttons
   const logoutBtns = document.querySelectorAll('#logoutBtn');
   logoutBtns.forEach(btn => {
@@ -59,7 +62,6 @@ function fetchBooksList(callback) {
   fetch(functionURL)
     .then(response => response.json())
     .then(data => {
-      console.log("Books fetched:", data);
       if (data.books) callback(data.books);
       else callback([]);
     })
@@ -81,7 +83,7 @@ function fetchBookData(title, callback) {
   }
   const googleUrl = 'https://www.googleapis.com/books/v1/volumes?q=' + encodeURIComponent(title);
   fetch(googleUrl)
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
       if (data.totalItems > 0 && data.items && data.items[0].volumeInfo) {
         const info = data.items[0].volumeInfo;
@@ -118,12 +120,12 @@ function fetchBookData(title, callback) {
 function fetchOpenLibrary(title, callback) {
   const olUrl = 'https://openlibrary.org/search.json?title=' + encodeURIComponent(title);
   fetch(olUrl)
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
       if (data.docs && data.docs.length > 0) {
         const doc = data.docs[0];
         const coverID = doc.cover_i;
-        const coverUrl = coverID ? 'https://covers.openlibrary.org/b/id/' + coverID + '-M.jpg' : null;
+        const coverUrl = coverID ? `https://covers.openlibrary.org/b/id/${coverID}-M.jpg` : null;
         const synopsis = doc.first_sentence ? doc.first_sentence.join(" ") : "";
         const authors = doc.author_name ? doc.author_name.join(", ") : "";
         const publishedYear = doc.first_publish_year ? doc.first_publish_year.toString() : "";
@@ -142,14 +144,14 @@ function fetchOpenLibrary(title, callback) {
 }
 
 /*********************************************
- * HELPER: Clean title from filename
+ * CLEAN TITLE FROM FILENAME
  *********************************************/
 function cleanTitle(filename) {
   return filename.replace(/\.pdf$/i, '').replace(/[_-]/g, ' ').trim();
 }
 
 /*********************************************
- * CREATE BOOK ELEMENT (with hover tooltip)
+ * CREATE BOOK ELEMENT
  *********************************************/
 function createBookElement(book, title, data) {
   const bookElement = document.createElement('div');
@@ -165,6 +167,7 @@ function createBookElement(book, title, data) {
       <p><strong>Categories:</strong> ${data.categories.join(", ") || "None"}</p>
     </div>
   `;
+  // Click => open reader
   bookElement.addEventListener('click', () => {
     window.location.href = `reader.html?bookName=${encodeURIComponent(book.name)}&download_url=${encodeURIComponent(book.download_url)}`;
   });
@@ -175,7 +178,7 @@ function createBookElement(book, title, data) {
  * HOME PAGE LOGIC
  *********************************************/
 function loadHomePage() {
-  // User-specific "Continue Reading"
+  // Show user-specific "Continue Reading"
   const currentReads = getUserList('currentReads');
   const continueSection = document.getElementById('continue-reading-container');
   if (continueSection && currentReads.length > 0) {
@@ -187,14 +190,12 @@ function loadHomePage() {
       });
     });
   }
-  // Other rows from the master list
+
   fetchBooksList(books => {
+    // "Your Next Read" => first 5
     const nextContainer = document.getElementById('next-read-container');
-    const topPicksContainer = document.getElementById('top-picks-container');
-    const fantasyContainer = document.getElementById('fantasy-container');
-    
     if (nextContainer) {
-      books.forEach(book => {
+      books.slice(0, 5).forEach(book => {
         const title = cleanTitle(book.name);
         fetchBookData(title, data => {
           const elem = createBookElement(book, title, data);
@@ -202,8 +203,10 @@ function loadHomePage() {
         });
       });
     }
+    // "Top Picks" => next 5
+    const topPicksContainer = document.getElementById('top-picks-container');
     if (topPicksContainer) {
-      books.forEach(book => {
+      books.slice(5, 10).forEach(book => {
         const title = cleanTitle(book.name);
         fetchBookData(title, data => {
           const elem = createBookElement(book, title, data);
@@ -211,11 +214,14 @@ function loadHomePage() {
         });
       });
     }
+    // "Fantasy" => filter by categories
+    const fantasyContainer = document.getElementById('fantasy-container');
     if (fantasyContainer) {
       books.forEach(book => {
         const title = cleanTitle(book.name);
         fetchBookData(title, data => {
-          if (data.categories.map(c => c.toLowerCase()).includes('fantasy')) {
+          const categoriesLower = data.categories.map(c => c.toLowerCase());
+          if (categoriesLower.includes('fantasy')) {
             const elem = createBookElement(book, title, data);
             fantasyContainer.appendChild(elem);
           }
@@ -226,30 +232,49 @@ function loadHomePage() {
 }
 
 /*********************************************
- * LIBRARY PAGE LOGIC
+ * LIBRARY PAGE LOGIC (With Search)
  *********************************************/
 function loadLibraryPage() {
+  const librarySection = document.getElementById('library-container');
+  const searchBar = document.getElementById('searchBar');
+  if (!librarySection || !searchBar) return;
+
+  let allBooks = [];
+
   fetchBooksList(books => {
-    const librarySection = document.getElementById('library-container');
-    if (!librarySection) return;
-    books.forEach(book => {
+    allBooks = books; // store them for search
+    displayLibraryBooks(books);
+  });
+
+  function displayLibraryBooks(bookArray) {
+    librarySection.innerHTML = '';
+    bookArray.forEach(book => {
       const title = cleanTitle(book.name);
       fetchBookData(title, data => {
         const elem = createBookElement(book, title, data);
         librarySection.appendChild(elem);
       });
     });
+  }
+
+  // Live search
+  searchBar.addEventListener('input', () => {
+    const query = searchBar.value.toLowerCase();
+    const filtered = allBooks.filter(b => cleanTitle(b.name).toLowerCase().includes(query));
+    displayLibraryBooks(filtered);
   });
 }
 
 /*********************************************
- * DASHBOARD PAGE LOGIC (User-Specific TBR and Liked)
+ * DASHBOARD PAGE LOGIC (TBR & Liked - user-specific)
  *********************************************/
 function loadDashboardPage() {
+  const tbrSection = document.getElementById('tbr-container');
+  const likedSection = document.getElementById('liked-container');
   const tbrList = getUserList('tbr');
   const likedList = getUserList('liked');
-  
-  const tbrSection = document.getElementById('tbr-container');
+
+  // TBR
   if (tbrSection) {
     tbrList.forEach(item => {
       fetchBookData(item.title, data => {
@@ -259,7 +284,8 @@ function loadDashboardPage() {
       });
     });
   }
-  const likedSection = document.getElementById('liked-container');
+
+  // Liked
   if (likedSection) {
     likedList.forEach(item => {
       fetchBookData(item.title, data => {
@@ -272,7 +298,7 @@ function loadDashboardPage() {
 }
 
 /*********************************************
- * READER PAGE LOGIC (Advanced PDF Viewer)
+ * READER PAGE LOGIC (Advanced PDF Reader)
  *********************************************/
 let pdfDoc = null;
 let currentPage = 1;
@@ -284,7 +310,7 @@ function loadReaderPage() {
   const bookName = urlParams.get('bookName');
   const downloadUrl = urlParams.get('download_url');
   if (!downloadUrl || !bookName) {
-    console.error("Missing bookName or download_url in URL");
+    console.error("Missing bookName or downloadUrl");
     return;
   }
 
@@ -304,6 +330,7 @@ function loadReaderPage() {
     pdfDoc = pdf;
     totalPages = pdf.numPages;
     pageCountSpan.textContent = totalPages;
+    // Restore reading progress
     const currentReads = getUserList('currentReads');
     const saved = currentReads.find(item => item.name === bookName);
     if (saved) currentPage = saved.page;
@@ -347,20 +374,19 @@ function loadReaderPage() {
     setUserList('currentReads', currentReads);
   }
 
+  // Navigation
   prevBtn.addEventListener('click', () => {
     if (currentPage > 1) {
       currentPage = isTwoPageLayout ? Math.max(1, currentPage - 2) : currentPage - 1;
       renderPages();
     }
   });
-
   nextBtn.addEventListener('click', () => {
     if (currentPage < totalPages) {
       currentPage = isTwoPageLayout ? currentPage + 2 : currentPage + 1;
       renderPages();
     }
   });
-
   goPageBtn.addEventListener('click', () => {
     const p = parseInt(pageInput.value, 10);
     if (!isNaN(p) && p >= 1 && p <= totalPages) {
@@ -368,23 +394,24 @@ function loadReaderPage() {
       renderPages();
     }
   });
-
   toggleLayoutBtn.addEventListener('click', () => {
     isTwoPageLayout = !isTwoPageLayout;
     renderPages();
   });
 
+  // Bookmark => add to user "liked" list
   bookmarkBtn.addEventListener('click', () => {
-    let liked = getUserList('liked');
-    if (!liked.find(item => item.name === bookName)) {
-      liked.push({ name: bookName, title: cleanTitle(bookName), download_url: downloadUrl });
-      setUserList('liked', liked);
+    const likedList = getUserList('liked');
+    if (!likedList.find(item => item.name === bookName)) {
+      likedList.push({ name: bookName, title: cleanTitle(bookName), download_url: downloadUrl });
+      setUserList('liked', likedList);
       alert(`Book "${cleanTitle(bookName)}" bookmarked!`);
     } else {
       alert("Already bookmarked.");
     }
   });
 
+  // Fullscreen
   fullscreenBtn.addEventListener('click', () => {
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen();
@@ -395,7 +422,7 @@ function loadReaderPage() {
 }
 
 /*********************************************
- * PAGE ROUTING
+ * PAGE ROUTER
  *********************************************/
 document.addEventListener('DOMContentLoaded', () => {
   const path = window.location.pathname;

@@ -2,9 +2,9 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
   try {
-    const repoOwner = "ieshan81";      // Your GitHub username
-    const repoName = "books-repo";       // Your repo containing PDFs
-    const folderPath = "pdfs";           // Folder where PDFs are stored
+    const repoOwner = "ieshan81";  // Your GitHub username
+    const repoName = "books-repo"; // The repository with "pdfs" folder
+    const folderPath = "pdfs";
 
     const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
     const response = await fetch(url);
@@ -13,7 +13,10 @@ exports.handler = async (event, context) => {
 
     const books = data
       .filter(file => file.name.toLowerCase().endsWith('.pdf'))
-      .map(file => ({ name: file.name, download_url: file.download_url }));
+      .map(file => ({
+        name: file.name,
+        download_url: file.download_url
+      }));
     
     return {
       statusCode: 200,
