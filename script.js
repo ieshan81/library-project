@@ -1,8 +1,7 @@
 /*********************************************
- * NETLIFY IDENTITY: LOGIN & LOGOUT
+ * NETLIFY IDENTITY: AUTO-OPEN, LOGIN, LOGOUT
  *********************************************/
 document.addEventListener('DOMContentLoaded', () => {
-  // Auto-open the Identity widget if not logged in
   if (window.netlifyIdentity) {
     window.netlifyIdentity.on('init', user => {
       if (!user) {
@@ -18,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = 'index.html';
     });
   }
-  
   // Optional manual login button (if present)
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) {
@@ -27,8 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.netlifyIdentity) window.netlifyIdentity.open();
     });
   }
-  
-  // Logout button(s)
+  // Logout buttons
   const logoutBtns = document.querySelectorAll('#logoutBtn');
   logoutBtns.forEach(btn => {
     btn.addEventListener('click', e => {
@@ -39,7 +36,23 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /*********************************************
- * BOOKS LISTING: FETCH BOOKS FROM NETLIFY FUNCTION
+ * USER-SPECIFIC STORAGE HELPERS
+ *********************************************/
+function getUserId() {
+  const user = window.netlifyIdentity && window.netlifyIdentity.currentUser();
+  return user ? user.id : 'guest';
+}
+function getUserList(key) {
+  const userId = getUserId();
+  return JSON.parse(localStorage.getItem(key + '_' + userId)) || [];
+}
+function setUserList(key, list) {
+  const userId = getUserId();
+  localStorage.setItem(key + '_' + userId, JSON.stringify(list));
+}
+
+/*********************************************
+ * FETCH BOOKS FROM NETLIFY FUNCTION
  *********************************************/
 function fetchBooksList(callback) {
   const functionURL = '/.netlify/functions/listBooks';
@@ -57,16 +70,16 @@ function fetchBooksList(callback) {
 }
 
 /*********************************************
- * BOOK METADATA: FETCH FROM GOOGLE BOOKS / OPEN LIBRARY
+ * FETCH BOOK METADATA (Google Books / Open Library)
  *********************************************/
 function fetchBookData(title, callback) {
-  const cacheKey = `bookData_${title}`;
+  const cacheKey = 'bookData_' + title;
   const cached = localStorage.getItem(cacheKey);
   if (cached) {
     callback(JSON.parse(cached));
     return;
   }
-  const googleUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(title)}`;
+  const googleUrl = 'https://www.googleapis.com/books/v1/volumes?q=' + encodeURIComponent(title);
   fetch(googleUrl)
     .then(response => response.json())
     .then(data => {
@@ -103,20 +116,20 @@ function fetchBookData(title, callback) {
 }
 
 function fetchOpenLibrary(title, callback) {
-  const olUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(title)}`;
+  const olUrl = 'https://openlibrary.org/search.json?title=' + encodeURIComponent(title);
   fetch(olUrl)
     .then(response => response.json())
     .then(data => {
       if (data.docs && data.docs.length > 0) {
         const doc = data.docs[0];
         const coverID = doc.cover_i;
-        const coverUrl = coverID ? `https://covers.openlibrary.org/b/id/${coverID}-M.jpg` : null;
+        const coverUrl = coverID ? 'https://covers.openlibrary.org/b/id/' + coverID + '-M.jpg' : null;
         const synopsis = doc.first_sentence ? doc.first_sentence.join(" ") : "";
         const authors = doc.author_name ? doc.author_name.join(", ") : "";
         const publishedYear = doc.first_publish_year ? doc.first_publish_year.toString() : "";
         const categories = doc.subject ? doc.subject.slice(0,2) : [];
         const bookData = { coverUrl, synopsis, authors, publishedYear, categories };
-        localStorage.setItem(`bookData_${title}`, JSON.stringify(bookData));
+        localStorage.setItem('bookData_' + title, JSON.stringify(bookData));
         callback(bookData);
       } else {
         callback({ coverUrl: null, synopsis: "", authors: "", publishedYear: "", categories: [] });
@@ -129,14 +142,14 @@ function fetchOpenLibrary(title, callback) {
 }
 
 /*********************************************
- * HELPER: CLEAN TITLE FROM FILENAME
+ * HELPER: Clean title from filename
  *********************************************/
 function cleanTitle(filename) {
   return filename.replace(/\.pdf$/i, '').replace(/[_-]/g, ' ').trim();
 }
 
 /*********************************************
- * CREATE BOOK ELEMENT (with tooltip)
+ * CREATE BOOK ELEMENT (with hover tooltip)
  *********************************************/
 function createBookElement(book, title, data) {
   const bookElement = document.createElement('div');
@@ -162,8 +175,8 @@ function createBookElement(book, title, data) {
  * HOME PAGE LOGIC
  *********************************************/
 function loadHomePage() {
-  // Show "Continue Reading" if progress exists
-  const currentReads = JSON.parse(localStorage.getItem('currentReads')) || [];
+  // User-specific "Continue Reading"
+  const currentReads = getUserList('currentReads');
   const continueSection = document.getElementById('continue-reading-container');
   if (continueSection && currentReads.length > 0) {
     currentReads.forEach(item => {
@@ -174,16 +187,14 @@ function loadHomePage() {
       });
     });
   }
-
-  // Fetch list and fill other rows
+  // Other rows from the master list
   fetchBooksList(books => {
-    const slice = books.slice(0, 5);
     const nextContainer = document.getElementById('next-read-container');
     const topPicksContainer = document.getElementById('top-picks-container');
     const fantasyContainer = document.getElementById('fantasy-container');
-
+    
     if (nextContainer) {
-      slice.forEach(book => {
+      books.forEach(book => {
         const title = cleanTitle(book.name);
         fetchBookData(title, data => {
           const elem = createBookElement(book, title, data);
@@ -192,7 +203,7 @@ function loadHomePage() {
       });
     }
     if (topPicksContainer) {
-      slice.forEach(book => {
+      books.forEach(book => {
         const title = cleanTitle(book.name);
         fetchBookData(title, data => {
           const elem = createBookElement(book, title, data);
@@ -201,7 +212,7 @@ function loadHomePage() {
       });
     }
     if (fantasyContainer) {
-      slice.forEach(book => {
+      books.forEach(book => {
         const title = cleanTitle(book.name);
         fetchBookData(title, data => {
           if (data.categories.map(c => c.toLowerCase()).includes('fantasy')) {
@@ -232,31 +243,32 @@ function loadLibraryPage() {
 }
 
 /*********************************************
- * DASHBOARD PAGE LOGIC
+ * DASHBOARD PAGE LOGIC (User-Specific TBR and Liked)
  *********************************************/
 function loadDashboardPage() {
-  fetchBooksList(books => {
-    const tbrSection = document.getElementById('tbr-container');
-    if (tbrSection) {
-      books.slice(0, 5).forEach(book => {
-        const title = cleanTitle(book.name);
-        fetchBookData(title, data => {
-          const elem = createBookElement(book, title, data);
-          tbrSection.appendChild(elem);
-        });
+  const tbrList = getUserList('tbr');
+  const likedList = getUserList('liked');
+  
+  const tbrSection = document.getElementById('tbr-container');
+  if (tbrSection) {
+    tbrList.forEach(item => {
+      fetchBookData(item.title, data => {
+        const fakeBook = { name: item.name, download_url: item.download_url };
+        const elem = createBookElement(fakeBook, item.title, data);
+        tbrSection.appendChild(elem);
       });
-    }
-    const likedSection = document.getElementById('liked-container');
-    if (likedSection) {
-      books.slice(-5).forEach(book => {
-        const title = cleanTitle(book.name);
-        fetchBookData(title, data => {
-          const elem = createBookElement(book, title, data);
-          likedSection.appendChild(elem);
-        });
+    });
+  }
+  const likedSection = document.getElementById('liked-container');
+  if (likedSection) {
+    likedList.forEach(item => {
+      fetchBookData(item.title, data => {
+        const fakeBook = { name: item.name, download_url: item.download_url };
+        const elem = createBookElement(fakeBook, item.title, data);
+        likedSection.appendChild(elem);
       });
-    }
-  });
+    });
+  }
 }
 
 /*********************************************
@@ -272,7 +284,7 @@ function loadReaderPage() {
   const bookName = urlParams.get('bookName');
   const downloadUrl = urlParams.get('download_url');
   if (!downloadUrl || !bookName) {
-    console.error("Missing parameters in URL");
+    console.error("Missing bookName or download_url in URL");
     return;
   }
 
@@ -292,8 +304,7 @@ function loadReaderPage() {
     pdfDoc = pdf;
     totalPages = pdf.numPages;
     pageCountSpan.textContent = totalPages;
-    // Load saved reading progress if available
-    const currentReads = JSON.parse(localStorage.getItem('currentReads')) || [];
+    const currentReads = getUserList('currentReads');
     const saved = currentReads.find(item => item.name === bookName);
     if (saved) currentPage = saved.page;
     renderPages();
@@ -325,7 +336,7 @@ function loadReaderPage() {
   }
 
   function saveProgress() {
-    const currentReads = JSON.parse(localStorage.getItem('currentReads')) || [];
+    let currentReads = getUserList('currentReads');
     let existing = currentReads.find(item => item.name === bookName);
     if (existing) {
       existing.page = currentPage;
@@ -333,7 +344,7 @@ function loadReaderPage() {
       existing = { name: bookName, title: cleanTitle(bookName), download_url: downloadUrl, page: currentPage };
       currentReads.push(existing);
     }
-    localStorage.setItem('currentReads', JSON.stringify(currentReads));
+    setUserList('currentReads', currentReads);
   }
 
   prevBtn.addEventListener('click', () => {
@@ -364,21 +375,27 @@ function loadReaderPage() {
   });
 
   bookmarkBtn.addEventListener('click', () => {
-    alert(`Bookmarked page ${currentPage}`);
-    // (You could also store bookmarks in localStorage if desired)
+    let liked = getUserList('liked');
+    if (!liked.find(item => item.name === bookName)) {
+      liked.push({ name: bookName, title: cleanTitle(bookName), download_url: downloadUrl });
+      setUserList('liked', liked);
+      alert(`Book "${cleanTitle(bookName)}" bookmarked!`);
+    } else {
+      alert("Already bookmarked.");
+    }
   });
 
   fullscreenBtn.addEventListener('click', () => {
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen();
     } else {
-      alert("Fullscreen mode not supported.");
+      alert("Fullscreen not supported.");
     }
   });
 }
 
 /*********************************************
- * PAGE LOAD ROUTER
+ * PAGE ROUTING
  *********************************************/
 document.addEventListener('DOMContentLoaded', () => {
   const path = window.location.pathname;

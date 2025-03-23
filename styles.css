@@ -8,16 +8,16 @@
 
 body {
   font-family: 'Roboto', sans-serif;
-  overflow-x: hidden;
   background-color: #141414;
   color: #fff;
+  overflow-x: hidden;
 }
 
 /* LOGIN PAGE */
 .login-body {
   height: 100vh;
-  background-color: #141414;
   position: relative;
+  background-color: #141414;
 }
 .login-background {
   width: 100%;
@@ -194,10 +194,14 @@ body {
   width: 150px;
   margin-right: 10px;
   cursor: pointer;
+  transition: transform 0.3s;
 }
 .book img {
   width: 100%;
   border-radius: 4px;
+}
+.book:hover {
+  transform: scale(1.05);
 }
 .book h3 {
   font-size: 1rem;
