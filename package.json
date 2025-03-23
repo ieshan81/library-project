@@ -1,7 +1,7 @@
 {
   "name": "netflix-books-website",
   "version": "1.0.0",
-  "description": "Netflix Books application",
+  "description": "Netflix Books application with advanced PDF reader and GitHub-based storage",
   "main": "index.js",
   "dependencies": {
     "node-fetch": "^2.6.1"

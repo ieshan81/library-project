@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Netflix Books - Login</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Supabase is no longer used for storage here; we’re using GitHub API and Netlify Identity -->
+  <!-- Netlify Identity Widget -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body class="login-body">
@@ -15,8 +15,10 @@
       <h1 class="login-logo">Netflix Books</h1>
       <div class="login-box">
         <h2>Sign In / Sign Up</h2>
-        <button id="loginBtn">Launch Identity Widget</button>
-        <p class="login-disclaimer">Demo only. Use the identity widget for sign in/up.</p>
+        <!-- The widget auto-opens if no user is logged in -->
+        <p class="login-disclaimer">
+          If you are not logged in, the Identity widget will open automatically.
+        </p>
       </div>
     </div>
   </div>

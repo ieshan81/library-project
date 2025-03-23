@@ -1,428 +1,304 @@
-/*********************************************************
- * GLOBAL RESET & FONTS
- *********************************************************/
- @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
- * {
-   margin: 0;
-   padding: 0;
-   box-sizing: border-box;
- }
- 
- body {
-   font-family: 'Roboto', sans-serif;
-   overflow-x: hidden;
- }
- 
- /**********************************************
-  * LOGIN PAGE (if using index.html)
-  **********************************************/
- .login-body {
-   height: 100vh;
-   width: 100%;
-   position: relative;
-   background-color: #141414;
- }
- .login-background {
-   width: 100%;
-   height: 100%;
-   background: url('https://assets.nflxext.com/ffe/siteui/vlv3/9b495931-108d-40e5-98b7-5be8432b407a/5c099bfa-7f78-45a0-93ab-bb8260f94be7/NG-en-20230313-popsignuptwoweeks-perspective_alpha_website_large.jpg')
-     center/cover no-repeat;
-   position: relative;
- }
- .login-gradient {
-   position: absolute;
-   width: 100%;
-   height: 100%;
-   background: rgba(0,0,0,0.5);
-   top: 0;
-   left: 0;
- }
- .login-content {
-   position: absolute;
-   width: 100%;
-   height: 100%;
-   z-index: 2;
-   display: flex;
-   flex-direction: column;
-   justify-content: center;
-   align-items: center;
- }
- .login-logo {
-   font-size: 2.5rem;
-   margin-bottom: 20px;
-   color: #e50914;
- }
- .login-box {
-   background-color: rgba(0,0,0,0.75);
-   padding: 40px;
-   border-radius: 6px;
-   width: 300px;
-   text-align: center;
- }
- .login-box h2 {
-   margin-bottom: 20px;
- }
- .login-box input {
-   display: block;
-   width: 100%;
-   margin-bottom: 16px;
-   padding: 12px;
-   border: none;
-   border-radius: 4px;
-   font-size: 1rem;
- }
- .login-box button {
-   width: 100%;
-   padding: 14px;
-   background-color: #e50914;
-   border: none;
-   color: #fff;
-   font-size: 1rem;
-   border-radius: 4px;
-   cursor: pointer;
-   font-weight: 700;
- }
- .login-box button:hover {
-   background-color: #f6121d;
- }
- .login-disclaimer {
-   font-size: 0.8rem;
-   color: #ccc;
-   margin-top: 10px;
- }
- 
- /**********************************************
-  * NETFLIX-STYLE PAGES (non-login)
-  **********************************************/
- body:not(.login-body) {
-   background-color: #141414;
-   color: #fff;
- }
- 
- /**********************************************
-  * HEADER / NAV
-  **********************************************/
- .nf-header {
-   display: flex;
-   align-items: center;
-   padding: 10px 20px;
-   background: rgba(0,0,0,0.8);
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   z-index: 10;
- }
- .nf-logo {
-   font-size: 1.8rem;
-   font-weight: 700;
-   color: #e50914;
-   margin-right: 20px;
- }
- .nf-nav-links {
-   margin-left: auto;
- }
- .nf-nav-links a {
-   color: #fff;
-   margin-left: 15px;
-   text-decoration: none;
-   font-weight: 500;
- }
- .nf-nav-links a:hover {
-   text-decoration: underline;
- }
- 
- /**********************************************
-  * FOOTER
-  **********************************************/
- .nf-footer {
-   background: #000;
-   text-align: center;
-   padding: 10px;
-   position: fixed;
-   bottom: 0;
-   width: 100%;
-   color: #aaa;
- }
- 
- /**********************************************
-  * HERO SECTION (HOME PAGE)
-  **********************************************/
- .nf-hero {
-   position: relative;
-   height: 60vh;
-   background: url('https://images.unsplash.com/photo-1597820071489-447d5c60c8a7') center/cover no-repeat;
-   display: flex;
-   align-items: center;
-   justify-content: flex-start;
- }
- .nf-hero-overlay {
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
- }
- .nf-hero-content {
-   position: relative;
-   z-index: 1;
-   margin-left: 50px;
-   max-width: 600px;
- }
- .nf-hero-content h1 {
-   font-size: 3rem;
-   margin-bottom: 20px;
- }
- .nf-hero-content p {
-   font-size: 1.2rem;
-   margin-bottom: 20px;
- }
- .nf-hero-btn {
-   display: inline-block;
-   background-color: #e50914;
-   color: #fff;
-   padding: 14px 24px;
-   border-radius: 4px;
-   font-weight: 700;
-   text-decoration: none;
- }
- .nf-hero-btn:hover {
-   background-color: #f6121d;
- }
- 
- /**********************************************
-  * CATEGORY CONTAINERS & ROWS
-  **********************************************/
- .nf-category-container {
-   padding: 20px;
-   margin-top: 60px;
- }
- .nf-row-title {
-   font-size: 1.5rem;
-   margin-bottom: 10px;
-   padding-left: 20px;
- }
- .nf-row-books {
-   display: flex;
-   overflow-x: auto;
-   padding: 0 20px 10px;
- }
- .nf-row-books::-webkit-scrollbar {
-   height: 8px;
- }
- .nf-row-books::-webkit-scrollbar-thumb {
-   background-color: #444;
-   border-radius: 4px;
- }
- 
- /**********************************************
-  * ADVANCED HOVER CARD (Portrait Ratio)
-  **********************************************/
- .nf-hover-card {
-   width: 200px;
-   height: 300px;
-   margin-right: 10px;
-   background-color: #333;
-   border-radius: 6px;
-   position: relative;
-   overflow: hidden;
-   cursor: pointer;
-   transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
- }
- .nf-hover-card .card-poster {
-   width: 100%;
-   height: 100%;
-   background-size: cover;
-   background-position: center;
- }
- .nf-hover-card:hover {
-   width: 400px;
-   height: 600px;
-   transform: translateY(-20px);
-   z-index: 999;
- }
- .nf-hover-card .card-overlay {
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background: rgba(0,0,0,0.85);
-   opacity: 0;
-   visibility: hidden;
-   transition: opacity 0.3s ease, visibility 0.3s ease;
-   display: flex;
-   justify-content: center;
-   align-items: center;
- }
- .nf-hover-card:hover .card-overlay {
-   opacity: 1;
-   visibility: visible;
- }
- .overlay-content {
-   width: 90%;
-   max-height: 90%;
-   overflow-y: auto;
- }
- .overlay-content h3.overlay-title {
-   font-size: 1.2rem;
-   margin-bottom: 8px;
- }
- .overlay-content .overlay-meta {
-   font-size: 0.9rem;
-   color: #ccc;
-   margin-bottom: 8px;
- }
- .overlay-content .overlay-synopsis {
-   font-size: 0.85rem;
-   line-height: 1.2;
-   margin-bottom: 8px;
- }
- .overlay-actions {
-   display: flex;
-   gap: 6px;
-   margin-bottom: 10px;
- }
- .overlay-actions button {
-   background-color: #e50914;
-   border: none;
-   border-radius: 4px;
-   padding: 6px 10px;
-   font-size: 0.8rem;
-   color: #fff;
-   cursor: pointer;
- }
- .overlay-actions button:hover {
-   background-color: #f6121d;
- }
- .overlay-chapters {
-   border-top: 1px solid #444;
-   padding-top: 6px;
-   font-size: 0.8rem;
-   color: #ccc;
- }
- 
- /**********************************************
-  * LIBRARY & DASHBOARD PAGES
-  **********************************************/
- #library-section,
- .dashboard-section {
-   margin-top: 80px;
-   padding: 20px;
- }
- .dashboard-section h2 {
-   margin-bottom: 20px;
-   font-size: 1.8rem;
- }
- .dashboard-row {
-   margin-bottom: 40px;
- }
- .dashboard-row h3 {
-   font-size: 1.5rem;
-   margin-bottom: 10px;
-   padding-left: 20px;
- }
- #tbr-container,
- #liked-container,
- #library-container {
-   display: flex;
-   overflow-x: auto;
-   padding: 0 20px 10px;
- }
- #tbr-container::-webkit-scrollbar,
- #liked-container::-webkit-scrollbar,
- #library-container::-webkit-scrollbar {
-   height: 8px;
- }
- #tbr-container::-webkit-scrollbar-thumb,
- #liked-container::-webkit-scrollbar-thumb,
- #library-container::-webkit-scrollbar-thumb {
-   background-color: #444;
-   border-radius: 4px;
- }
- 
- /**********************************************
-  * PDF.js READER
-  **********************************************/
- .pdf-reader-container {
-   background: #000;
-   margin: 80px auto;
-   max-width: 900px;
-   border-radius: 4px;
-   padding: 10px;
-   text-align: center;
- }
- #pdf-canvas-container {
-   display: flex;
-   justify-content: center;
-   gap: 10px;
- }
- #pdf-canvas-1,
- #pdf-canvas-2 {
-   max-width: 100%;
-   border: 1px solid #444;
- }
- #pdf-canvas-2 {
-   display: none;
- }
- .pdf-controls {
-   margin-top: 10px;
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   flex-wrap: wrap;
-   gap: 5px;
- }
- .pdf-controls button,
- .pdf-controls input {
-   background-color: #e50914;
-   color: #fff;
-   border: none;
-   border-radius: 4px;
-   padding: 8px 12px;
-   cursor: pointer;
-   font-size: 1rem;
- }
- .pdf-controls button:hover {
-   background-color: #f6121d;
- }
- .pdf-controls input {
-   width: 80px;
-   text-align: center;
- }
- .pdf-controls span {
-   color: #fff;
-   font-size: 1rem;
- }
- 
- /**********************************************
-  * RESPONSIVE
-  **********************************************/
- @media (max-width: 768px) {
-   .nf-logo {
-     font-size: 1.5rem;
-   }
-   .nf-hero-content h1 {
-     font-size: 2rem;
-   }
-   .nf-hero-content p {
-     font-size: 1rem;
-   }
-   .nf-row-title,
-   .dashboard-row h3 {
-     font-size: 1.2rem;
-   }
-   .login-logo {
-     font-size: 2rem;
-   }
-   .nf-hover-card {
-     width: 133px;
-     height: 200px;
-   }
-   .nf-hover-card:hover {
-     width: 266px;
-     height: 400px;
-   }
- }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  overflow-x: hidden;
+  background-color: #141414;
+  color: #fff;
+}
+
+/* LOGIN PAGE */
+.login-body {
+  height: 100vh;
+  background-color: #141414;
+  position: relative;
+}
+.login-background {
+  width: 100%;
+  height: 100%;
+  background: url('https://assets.nflxext.com/ffe/siteui/vlv3/9b495931-108d-40e5-98b7-5be8432b407a/5c099bfa-7f78-45a0-93ab-bb8260f94be7/NG-en-20230313-popsignuptwoweeks-perspective_alpha_website_large.jpg')
+    center/cover no-repeat;
+  position: relative;
+}
+.login-gradient {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
+}
+.login-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.login-logo {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #e50914;
+}
+.login-box {
+  background-color: rgba(0,0,0,0.75);
+  padding: 40px;
+  border-radius: 6px;
+  width: 300px;
+  text-align: center;
+}
+.login-box h2 {
+  margin-bottom: 20px;
+}
+.login-box button {
+  width: 100%;
+  padding: 14px;
+  background-color: #e50914;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.login-box button:hover {
+  background-color: #f6121d;
+}
+.login-disclaimer {
+  font-size: 0.8rem;
+  color: #ccc;
+  margin-top: 10px;
+}
+
+/* HEADER / NAV */
+.nf-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(0,0,0,0.8);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+.nf-logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #e50914;
+  margin-right: 20px;
+}
+.nf-nav-links {
+  margin-left: auto;
+}
+.nf-nav-links a {
+  color: #fff;
+  margin-left: 15px;
+  text-decoration: none;
+  font-weight: 500;
+}
+.nf-nav-links a:hover {
+  text-decoration: underline;
+}
+
+/* FOOTER */
+.nf-footer {
+  background: #000;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  color: #aaa;
+}
+
+/* HERO SECTION (HOME PAGE) */
+.nf-hero {
+  position: relative;
+  height: 60vh;
+  background: url('https://images.unsplash.com/photo-1597820071489-447d5c60c8a7') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.nf-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+}
+.nf-hero-content {
+  position: relative;
+  z-index: 1;
+  margin-left: 50px;
+  max-width: 600px;
+}
+.nf-hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+.nf-hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+.nf-hero-btn {
+  display: inline-block;
+  background-color: #e50914;
+  color: #fff;
+  padding: 14px 24px;
+  border-radius: 4px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.nf-hero-btn:hover {
+  background-color: #f6121d;
+}
+
+/* CATEGORY CONTAINERS & BOOK ROWS */
+.nf-category-container {
+  padding: 20px;
+  margin-top: 60px;
+}
+.nf-row-title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  padding-left: 20px;
+}
+.nf-row-books {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 20px 10px;
+}
+.nf-row-books::-webkit-scrollbar {
+  height: 8px;
+}
+.nf-row-books::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 4px;
+}
+
+/* BOOK CARDS */
+.book {
+  position: relative;
+  width: 150px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.book img {
+  width: 100%;
+  border-radius: 4px;
+}
+.book h3 {
+  font-size: 1rem;
+  margin: 5px 0;
+}
+.book p {
+  font-size: 0.9rem;
+  color: #ccc;
+}
+.book .tooltip {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: rgba(0,0,0,0.8);
+  padding: 10px;
+  border-radius: 4px;
+  width: 200px;
+  font-size: 0.8rem;
+  z-index: 999;
+}
+.book:hover .tooltip {
+  display: block;
+}
+
+/* DASHBOARD */
+.dashboard-section {
+  margin-top: 80px;
+  padding: 20px;
+}
+.dashboard-section h2 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+.dashboard-row {
+  margin-bottom: 40px;
+}
+.dashboard-row h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  padding-left: 20px;
+}
+
+/* PDF READER */
+.pdf-reader-container {
+  background: #000;
+  margin: 80px auto;
+  max-width: 900px;
+  border-radius: 4px;
+  padding: 10px;
+  text-align: center;
+}
+#pdf-canvas-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+#pdf-canvas-1,
+#pdf-canvas-2 {
+  max-width: 100%;
+  border: 1px solid #444;
+}
+#pdf-canvas-2 {
+  display: none;
+}
+.pdf-controls {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.pdf-controls button,
+.pdf-controls input {
+  background-color: #e50914;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.pdf-controls button:hover {
+  background-color: #f6121d;
+}
+.pdf-controls input {
+  width: 80px;
+  text-align: center;
+}
+.pdf-controls span {
+  color: #fff;
+  font-size: 1rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nf-logo { font-size: 1.5rem; }
+  .nf-hero-content h1 { font-size: 2rem; }
+  .nf-hero-content p { font-size: 1rem; }
+  .nf-row-title, .dashboard-row h3 { font-size: 1.2rem; }
+  .login-logo { font-size: 2rem; }
+  .book { width: 120px; }
+}
