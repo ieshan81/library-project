@@ -296,7 +296,7 @@ function loadReaderPage() {
 
   const pdfViewer = document.getElementById('pdf-viewer');
   if (pdfViewer) {
-    const { data } = supabaseClient.storage.from('books').getPublicUrl(`pdfs/${book}`);
+    const { data } = supabaseClient.storage.from('books').getPublicUrl(`pdfs${book}`);
     const pdfUrl = data.publicUrl;
 
     pdfjsLib.getDocument(pdfUrl).promise.then(pdf => {
