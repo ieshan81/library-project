@@ -5,7 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.netlifyIdentity) {
     // If not logged in, open the widget automatically
     window.netlifyIdentity.on('init', user => {
-      if (!user) window.netlifyIdentity.open();
+      if (!user) {
+        window.netlifyIdentity.open();
+      }
     });
     // Redirect after login
     window.netlifyIdentity.on('login', user => {
@@ -24,7 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loginBtn) {
     loginBtn.addEventListener('click', e => {
       e.preventDefault();
-      if (window.netlifyIdentity) window.netlifyIdentity.open();
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.open();
+      }
     });
   }
   
@@ -33,7 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
   logoutBtns.forEach(btn => {
     btn.addEventListener('click', e => {
       e.preventDefault();
-      if (window.netlifyIdentity) window.netlifyIdentity.logout();
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.logout();
+      }
     });
   });
 });
@@ -426,8 +432,13 @@ function loadReaderPage() {
  *********************************************/
 document.addEventListener('DOMContentLoaded', () => {
   const path = window.location.pathname;
-  if (path.includes('home.html')) loadHomePage();
-  else if (path.includes('library.html')) loadLibraryPage();
-  else if (path.includes('dashboard.html')) loadDashboardPage();
-  else if (path.includes('reader.html')) loadReaderPage();
+  if (path.includes('home.html')) {
+    loadHomePage();
+  } else if (path.includes('library.html')) {
+    loadLibraryPage();
+  } else if (path.includes('dashboard.html')) {
+    loadDashboardPage();
+  } else if (path.includes('reader.html')) {
+    loadReaderPage();
+  }
 });
