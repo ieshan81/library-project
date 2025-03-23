@@ -146,7 +146,7 @@ function loadHomePage() {
 
     // Continue Reading Section
     const currentReads = JSON.parse(localStorage.getItem('currentReads')) || [];
-    const continueReadingSection = document.getElementById('continue-reading');
+    const continueReadingSection = document.getElementById('continue-reading-container');
     if (continueReadingSection) {
       if (currentReads.length > 0) {
         currentReads.forEach(book => {
@@ -162,7 +162,7 @@ function loadHomePage() {
     }
 
     // Your Next Read Section
-    const nextReadSection = document.getElementById('next-read');
+    const nextReadSection = document.getElementById('next-read-container');
     if (nextReadSection) {
       books.slice(0, 5).forEach(book => {
         const title = book.replace(/_/g, ' ').replace(/-/g, ' ').split('.pdf')[0];
@@ -174,7 +174,7 @@ function loadHomePage() {
     }
 
     // Top Picks Section
-    const topPicksSection = document.getElementById('top-picks');
+    const topPicksSection = document.getElementById('top-picks-container');
     if (topPicksSection) {
       books.slice(0, 5).forEach(book => {
         const title = book.replace(/_/g, ' ').replace(/-/g, ' ').split('.pdf')[0];
@@ -186,7 +186,7 @@ function loadHomePage() {
     }
 
     // Fantasy Section
-    const fantasySection = document.getElementById('fantasy');
+    const fantasySection = document.getElementById('fantasy-container');
     if (fantasySection) {
       books.slice(0, 5).forEach(book => {
         const title = book.replace(/_/g, ' ').replace(/-/g, ' ').split('.pdf')[0];
@@ -211,7 +211,7 @@ function loadLibraryPage() {
       return;
     }
 
-    const librarySection = document.getElementById('library-books');
+    const librarySection = document.getElementById('library-container');
     if (librarySection) {
       books.forEach(book => {
         const title = book.replace(/_/g, ' ').replace(/-/g, ' ').split('.pdf')[0];
@@ -235,7 +235,7 @@ function loadDashboardPage() {
     }
 
     // To Be Read (TBR) Section
-    const tbrSection = document.getElementById('tbr-books');
+    const tbrSection = document.getElementById('tbr-container');
     if (tbrSection) {
       books.slice(0, 5).forEach(book => {
         const title = book.replace(/_/g, ' ').replace(/-/g, ' ').split('.pdf')[0];
@@ -246,14 +246,14 @@ function loadDashboardPage() {
       });
     }
 
-    // Recently Added Section
-    const recentlyAddedSection = document.getElementById('recently-added');
-    if (recentlyAddedSection) {
+    // Liked Books Section
+    const likedSection = document.getElementById('liked-container');
+    if (likedSection) {
       books.slice(-5).forEach(book => {
         const title = book.replace(/_/g, ' ').replace(/-/g, ' ').split('.pdf')[0];
         fetchBookData(title, data => {
           const bookElement = createBookElement(book, title, data);
-          recentlyAddedSection.appendChild(bookElement);
+          likedSection.appendChild(bookElement);
         });
       });
     }
